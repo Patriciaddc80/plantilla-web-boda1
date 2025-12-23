@@ -1,0 +1,96 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Fuentes locales */
+@font-face {
+  font-family: 'Kalufonia';
+  src: url('/fonts/Kalufonia-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Switzer';
+  src: url('/fonts/Switzer-Variable.ttf') format('truetype-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  /* Títulos grandes y medianos usan Kalufonia */
+  h1, h2, h3 { 
+    font-family: 'Kalufonia', serif;
+  }
+  
+  h1 { 
+    @apply text-4xl leading-tight; 
+  }
+  
+  h2 { 
+    @apply text-xl tracking-wide; 
+  }
+  
+  h3 {
+    @apply text-lg;
+  }
+  
+  /* Párrafos y textos pequeños usan Switzer */
+  p, span, a, li, input, textarea, button, label { 
+    font-family: 'Switzer', sans-serif;
+    @apply text-sm leading-relaxed; 
+  }
+  
+  body {
+    @apply bg-cream;
+    font-family: 'Switzer', sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  * {
+    @apply box-border;
+  }
+}
+
+/* Scroll suave */
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+body {
+  overflow-x: hidden;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Estilos personalizados para inputs */
+input[type="radio"] {
+  @apply accent-olive;
+}
+
+/* Animaciones personalizadas */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Smooth transitions */
+* {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}

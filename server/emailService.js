@@ -6,15 +6,18 @@ import { createRSVPEmailTemplate } from './emailTemplate.js'
 const createTransporter = () => {
   // Configuración usando variables de entorno
   // Para Gmail, necesitarás una "Contraseña de aplicación" en lugar de tu contraseña normal
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.SMTP_PORT || '587'),
-    secure: process.env.SMTP_SECURE === 'true', // true para 465, false para otros puertos
-    auth: {
-      user: process.env.SMTP_USER, // Tu email
-      pass: process.env.SMTP_PASS, // Tu contraseña o contraseña de aplicación
-    },
-  })
+    // Limpiar espacios de la contraseña si existen (Gmail app passwords pueden tener espacios)
+    const cleanPassword = process.env.SMTP_PASS.replace(/\s+/g, '')
+    
+    return nodemailer.createTransport({
+      host: process.env.SMTP_HOST || 'smtp.gmail.com',
+      port: parseInt(process.env.SMTP_PORT || '587'),
+      secure: process.env.SMTP_SECURE === 'true', // true para 465, false para otros puertos
+      auth: {
+        user: process.env.SMTP_USER, // Tu email
+        pass: cleanPassword, // Contraseña sin espacios
+      },
+    })
 }
 
 export async function sendRSVPEmail(rsvpData, recipientEmail) {
@@ -31,6 +34,10 @@ export async function sendRSVPEmail(rsvpData, recipientEmail) {
       console.warn('⚠️  La contraseña SMTP parece ser un placeholder. El email no se enviará.')
       return { success: false, error: 'Configuración de email incompleta' }
     }
+    
+    console.log('📧 Intentando enviar email a:', recipientEmail)
+    console.log('📧 Desde:', process.env.SMTP_USER)
+    console.log('🔐 SMTP Host:', process.env.SMTP_HOST || 'smtp.gmail.com')
 
     if (!recipientEmail) {
       console.warn('⚠️  No se especificó un email destinatario')
@@ -48,10 +55,14 @@ export async function sendRSVPEmail(rsvpData, recipientEmail) {
 
     // Verificar la conexión con manejo de errores específico
     try {
+      console.log('🔍 Verificando conexión SMTP...')
       await transporter.verify()
+      console.log('✅ Conexión SMTP verificada correctamente')
     } catch (verifyError) {
       console.error('❌ Error al verificar conexión SMTP:', verifyError.message)
-      return { success: false, error: 'No se pudo conectar con el servidor de email' }
+      console.error('📋 Código de error:', verifyError.code)
+      console.error('📋 Respuesta:', verifyError.response)
+      return { success: false, error: `No se pudo conectar con el servidor de email: ${verifyError.message}` }
     }
 
     // Crear el contenido del email
@@ -83,14 +94,26 @@ Manuela & Daniel
 
     // Enviar el email con manejo de errores específico
     try {
+      console.log('📤 Enviando email...')
       const info = await transporter.sendMail(mailOptions)
-      console.log('✅ Email enviado correctamente:', info.messageId)
+      console.log('✅ Email enviado correctamente!')
+      console.log('📬 Message ID:', info.messageId)
+      console.log('📧 Respuesta del servidor:', info.response)
       return { success: true, messageId: info.messageId }
     } catch (sendError) {
       console.error('❌ Error al enviar email:', sendError.message)
+      console.error('📋 Código de error:', sendError.code)
+      console.error('📋 Respuesta:', sendError.response)
+      if (sendError.code === 'EAUTH') {
+        console.error('🔐 Error de autenticación. Verifica:')
+        console.error('   1. Que estés usando una Contraseña de aplicación (no tu contraseña normal)')
+        console.error('   2. Que la verificación en 2 pasos esté activada en Gmail')
+        console.error('   3. Que la contraseña no tenga espacios o caracteres especiales incorrectos')
+      }
       return { 
         success: false, 
-        error: sendError.message || 'Error desconocido al enviar email'
+        error: sendError.message || 'Error desconocido al enviar email',
+        code: sendError.code
       }
     }
   } catch (error) {

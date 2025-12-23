@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "server": "node server/index.js",
     "dev:all": "concurrently \"npm run dev\" \"npm run server\"",
-    "admin": "vite --open /admin"
+    "admin": "vite --open /admin",
+    "test:email": "node server/testEmail.js"
   },
   "dependencies": {
     "@iconify/react": "^6.0.2",

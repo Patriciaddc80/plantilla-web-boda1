@@ -60,29 +60,26 @@ export default function CountdownCard() {
         >
           Cuenta Regresiva
         </motion.h2>
-        <div className="flex flex-row md:grid md:grid-cols-4 gap-2 sm:gap-3 md:gap-8 justify-center items-center">
+        <div className="flex flex-row md:grid md:grid-cols-4 gap-2 sm:gap-3 md:gap-8 lg:gap-12 justify-center items-center">
           {timeUnits.map((unit, index) => (
             <motion.div
               key={unit.label}
-              className="bg-white/70 backdrop-blur-sm p-1 sm:p-2 md:p-6 text-center shadow-lg border border-olive/40 sm:border-2 md:flex-1"
+              className="bg-white/70 backdrop-blur-sm p-2 sm:p-2 md:p-6 lg:p-8 xl:p-10 text-center shadow-lg border border-olive/40 sm:border-2 md:flex-1 w-[70px] h-[70px] sm:w-[75px] sm:h-[75px] md:w-auto md:h-auto lg:min-w-[140px] lg:min-h-[140px] xl:min-w-[160px] xl:min-h-[160px]"
               style={{
                 borderRadius: '50% 0% 50% 50% / 60% 60% 40% 40%',
-                minWidth: '50px',
-                maxWidth: '70px',
-                minHeight: '50px',
               }}
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.3 + index * 0.1 }}
             >
-              <div className="flex justify-center mb-0 md:mb-3">
-                <Icon icon={unit.icon} className="text-xs sm:text-lg md:text-3xl text-olive/80" width="1em" height="1em" />
+              <div className="flex justify-center mb-0 md:mb-3 lg:mb-4">
+                <Icon icon={unit.icon} className="text-sm sm:text-lg md:text-3xl lg:text-4xl xl:text-5xl text-olive/80" width="1em" height="1em" />
               </div>
-              <div className="text-xs sm:text-lg md:text-5xl font-semibold text-olive mb-0 md:mb-2">
+              <div className="text-sm sm:text-lg md:text-5xl lg:text-6xl xl:text-7xl font-semibold text-olive mb-0 md:mb-2 lg:mb-3">
                 {String(unit.value).padStart(2, '0')}
               </div>
-              <div className="text-[8px] sm:text-xs md:text-base text-olive/70 uppercase tracking-wide">
+              <div className="text-[9px] sm:text-xs md:text-base lg:text-lg xl:text-xl text-olive/70 uppercase tracking-wide">
                 {unit.label}
               </div>
             </motion.div>

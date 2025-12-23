@@ -26,15 +26,33 @@ export async function sendRSVPEmail(rsvpData, recipientEmail) {
       return { success: false, error: 'Configuración de email no disponible' }
     }
 
+    // Validar que la contraseña no sea el placeholder
+    if (process.env.SMTP_PASS.includes('TU_CONTRASEÑA') || process.env.SMTP_PASS.includes('AQUÍ')) {
+      console.warn('⚠️  La contraseña SMTP parece ser un placeholder. El email no se enviará.')
+      return { success: false, error: 'Configuración de email incompleta' }
+    }
+
     if (!recipientEmail) {
       console.warn('⚠️  No se especificó un email destinatario')
       return { success: false, error: 'Email destinatario no especificado' }
     }
 
-    const transporter = createTransporter()
+    // Crear transporter con manejo de errores
+    let transporter
+    try {
+      transporter = createTransporter()
+    } catch (transporterError) {
+      console.error('❌ Error al crear transporter de email:', transporterError.message)
+      return { success: false, error: 'Error al configurar el servicio de email' }
+    }
 
-    // Verificar la conexión
-    await transporter.verify()
+    // Verificar la conexión con manejo de errores específico
+    try {
+      await transporter.verify()
+    } catch (verifyError) {
+      console.error('❌ Error al verificar conexión SMTP:', verifyError.message)
+      return { success: false, error: 'No se pudo conectar con el servidor de email' }
+    }
 
     // Crear el contenido del email
     const htmlContent = createRSVPEmailTemplate(rsvpData)
@@ -63,17 +81,25 @@ Manuela & Daniel
       `.trim(),
     }
 
-    // Enviar el email
-    const info = await transporter.sendMail(mailOptions)
-    
-    console.log('✅ Email enviado correctamente:', info.messageId)
-    return { success: true, messageId: info.messageId }
+    // Enviar el email con manejo de errores específico
+    try {
+      const info = await transporter.sendMail(mailOptions)
+      console.log('✅ Email enviado correctamente:', info.messageId)
+      return { success: true, messageId: info.messageId }
+    } catch (sendError) {
+      console.error('❌ Error al enviar email:', sendError.message)
+      return { 
+        success: false, 
+        error: sendError.message || 'Error desconocido al enviar email'
+      }
+    }
   } catch (error) {
-    console.error('❌ Error al enviar email:', error)
+    // Captura cualquier error inesperado
+    console.error('❌ Error inesperado en sendRSVPEmail:', error)
     return { 
       success: false, 
-      error: error.message,
-      details: error
+      error: error.message || 'Error desconocido',
+      details: error.toString()
     }
   }
 }

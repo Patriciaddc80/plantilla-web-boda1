@@ -97,28 +97,37 @@ app.post('/api/rsvp', (req, res) => {
     // Guardar en archivo
     fs.writeFileSync(rsvpFile, JSON.stringify(existingData, null, 2), 'utf8')
 
-    // Enviar email de notificación (no bloquea la respuesta)
-    const recipientEmail = process.env.RSVP_NOTIFICATION_EMAIL || process.env.SMTP_USER
-    if (recipientEmail) {
-      sendRSVPEmail(newRSVP, recipientEmail)
-        .then(result => {
-          if (result.success) {
-            console.log('✅ Email de notificación enviado correctamente')
-          } else {
-            console.warn('⚠️  No se pudo enviar el email:', result.error)
-          }
-        })
-        .catch(error => {
-          console.error('❌ Error al enviar email (no crítico):', error)
-        })
-    } else {
-      console.warn('⚠️  No se configuró RSVP_NOTIFICATION_EMAIL. El email no se enviará.')
-    }
-
+    // Responder al cliente primero (antes de intentar enviar email)
     res.status(200).json({ 
       success: true, 
       message: 'RSVP guardado correctamente',
       data: newRSVP
+    })
+
+    // Enviar email de notificación de forma completamente asíncrona (no bloquea la respuesta)
+    // Esto se ejecuta después de enviar la respuesta, así que nunca puede causar un error 500
+    setImmediate(() => {
+      try {
+        const recipientEmail = process.env.RSVP_NOTIFICATION_EMAIL || process.env.SMTP_USER
+        if (recipientEmail) {
+          sendRSVPEmail(newRSVP, recipientEmail)
+            .then(result => {
+              if (result.success) {
+                console.log('✅ Email de notificación enviado correctamente')
+              } else {
+                console.warn('⚠️  No se pudo enviar el email:', result.error)
+              }
+            })
+            .catch(error => {
+              console.error('❌ Error al enviar email (no crítico):', error)
+            })
+        } else {
+          console.warn('⚠️  No se configuró RSVP_NOTIFICATION_EMAIL. El email no se enviará.')
+        }
+      } catch (emailError) {
+        // Esto nunca debería ejecutarse, pero por seguridad lo capturamos
+        console.error('❌ Error inesperado al intentar enviar email:', emailError)
+      }
     })
   } catch (error) {
     console.error('Error al guardar RSVP:', error)

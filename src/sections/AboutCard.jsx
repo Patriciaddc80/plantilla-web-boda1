@@ -40,7 +40,7 @@ export default function AboutCard() {
             {/* Contenido superpuesto: título, texto e imagen de novios */}
             <div className="relative flex flex-col items-center justify-center pt-6 px-3 gap-2 pb-6 sm:pt-8 sm:px-6 sm:gap-3 sm:pb-8 md:pt-12 md:px-12 md:gap-4 md:pb-12 h-full">
               <motion.h2 
-                className="text-lg sm:text-3xl md:text-5xl text-center text-olive px-2 mb-1 sm:mb-4"
+                className="text-2xl sm:text-3xl md:text-5xl text-center text-olive px-2 mb-1 sm:mb-4"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}

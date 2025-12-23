@@ -121,8 +121,9 @@ export default function RSVPCard() {
               <div className="flex justify-center mb-6">
                 <Icon icon="mdi:check-circle-outline" className="text-6xl text-olive" />
               </div>
-              <p className="text-2xl text-olive font-semibold mb-2">¡Gracias por confirmar!</p>
-              <p className="text-base text-olive/70">Nos vemos pronto</p>
+              <p className="text-2xl md:text-3xl text-olive font-semibold mb-3">¡Mensaje enviado correctamente!</p>
+              <p className="text-lg md:text-xl text-olive/80 mb-4 font-medium">Gracias por confirmar tu asistencia</p>
+              <p className="text-base md:text-lg text-olive/70">Hemos recibido tu confirmación y nos vemos pronto</p>
             </motion.div>
           ) : (
             <motion.form 

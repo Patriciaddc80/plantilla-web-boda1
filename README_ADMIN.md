@@ -10,9 +10,9 @@
    ```
 
 2. **Abrir el panel de administración:**
-   - Abre `src/admin/RSVPAdmin.jsx` en tu navegador
-   - O crea una ruta en tu aplicación para acceder al panel
-   - O ejecuta: `npm run dev` y navega a la página de administración
+   - Ejecuta: `npm run admin` para abrir directamente el panel
+   - O ejecuta: `npm run dev` y navega a `/admin` en tu navegador
+   - El panel está disponible en: `http://localhost:5173/admin`
 
 3. **El panel muestra:**
    - ✅ Estadísticas en tiempo real
@@ -80,23 +80,18 @@ Cada RSVP tiene la siguiente estructura:
 }
 ```
 
-## 🔧 Integrar el Panel en tu App
+## 🔧 Acceder al Panel
 
-Para agregar el panel de administración a tu aplicación principal:
+El panel de administración está disponible de dos formas:
 
-1. **Agregar ruta en `App.jsx`:**
-```jsx
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import RSVPAdmin from './admin/RSVPAdmin'
+1. **Usando el comando dedicado:**
+   ```bash
+   npm run admin
+   ```
+   Esto abrirá automáticamente el panel en tu navegador.
 
-// En tu componente App:
-<Routes>
-  <Route path="/admin" element={<RSVPAdmin />} />
-  {/* otras rutas */}
-</Routes>
-```
-
-2. **Acceder al panel:**
+2. **Accediendo manualmente:**
+   - Inicia el servidor de desarrollo: `npm run dev`
    - Navega a: `http://localhost:5173/admin`
 
 ## 📊 Estadísticas Disponibles
@@ -109,11 +104,9 @@ El endpoint `/api/rsvp/stats` devuelve:
 
 ## 💡 Notas Importantes
 
-- ⚠️ El servidor debe estar corriendo para que el panel funcione
+- ⚠️ El servidor debe estar corriendo (`npm run server`) para que el panel funcione
 - 📝 Los datos se guardan automáticamente en `server/data/rsvp.json`
 - 🔒 En producción, protege el panel de administración con autenticación
 - 📥 Puedes exportar los datos a CSV desde el panel
-
-
-
+- 📧 Configura el sistema de email siguiendo las instrucciones en `CONFIGURACION_EMAIL.md`
 

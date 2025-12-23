@@ -18,6 +18,16 @@ export default function App() {
       <div className="py-4 md:py-12"><StorySlider /></div>
       <div className="py-4 md:py-12"><GodparentsCard /></div>
       <div className="py-4 md:py-12"><TimelineCard /></div>
+      {/* Separador en móvil entre secciones */}
+      <div className="py-2 md:hidden">
+        <div className="w-full max-w-[280px] mx-auto px-3">
+          <img
+            src="/assets/divisor-lineas1.png"
+            alt="Separador decorativo"
+            className="w-full h-auto"
+          />
+        </div>
+      </div>
       <div className="py-2 md:py-12"><GalleryCard /></div>
       <div className="py-4 md:py-12"><RSVPCard /></div>
       <div className="py-4 md:py-12"><GiftsCard /></div>

@@ -74,21 +74,6 @@ export default function GalleryCard() {
       transition={{ duration: 0.8 }}
     >
       <div className="max-w-7xl mx-auto">
-        {/* Separador */}
-        <motion.div 
-          className="w-full max-w-[280px] sm:max-w-xs md:max-w-md mx-auto px-3 sm:px-6 mt-4 sm:mt-6 mb-4 sm:mb-6"
-          initial={{ opacity: 0, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.1, duration: 0.8 }}
-        >
-          <img
-            src="/assets/divisor-lineas1.png"
-            alt="Separador decorativo"
-            className="w-full h-auto"
-          />
-        </motion.div>
-        
         <motion.h2 
           className="text-2xl sm:text-3xl md:text-5xl mb-2 text-center text-olive font-kalufonia px-2"
           initial={{ opacity: 0, y: 20 }}

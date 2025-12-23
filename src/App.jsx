@@ -15,10 +15,10 @@ export default function App() {
       <HeroCard />
       <div className="py-4 md:py-12"><CountdownCard /></div>
       <div className="py-4 md:py-12"><AboutCard /></div>
-      <StorySlider />
+      <div className="py-4 md:py-12"><StorySlider /></div>
       <div className="py-4 md:py-12"><GodparentsCard /></div>
       <div className="py-4 md:py-12"><TimelineCard /></div>
-      <div className="py-4 md:py-12"><GalleryCard /></div>
+      <div className="py-2 md:py-12"><GalleryCard /></div>
       <div className="py-4 md:py-12"><RSVPCard /></div>
       <div className="py-4 md:py-12"><GiftsCard /></div>
       <FooterCard />

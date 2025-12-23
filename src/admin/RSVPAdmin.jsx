@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Icon } from '@iconify/react'
 
-const API_URL = 'http://localhost:3001/api'
+const API_URL = '/api'
 
 export default function RSVPAdmin() {
   const [rsvps, setRsvps] = useState([])

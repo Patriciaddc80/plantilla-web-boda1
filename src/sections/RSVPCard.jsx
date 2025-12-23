@@ -16,13 +16,19 @@ export default function RSVPCard() {
     e.preventDefault()
     
     try {
-      const response = await fetch('http://localhost:3001/api/rsvp', {
+      const response = await fetch('/api/rsvp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
       })
+
+      // Verificar si la respuesta es JSON válido
+      const contentType = response.headers.get('content-type')
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('La respuesta del servidor no es válida')
+      }
 
       const result = await response.json()
 
@@ -34,12 +40,17 @@ export default function RSVPCard() {
           setFormData({ name: '', email: '', guests: '', attendance: 'yes', message: '' })
         }, 3000)
       } else {
-        console.error('Error al guardar RSVP:', result.error)
-        alert('Hubo un error al enviar tu RSVP. Por favor, intenta de nuevo.')
+        console.error('Error al guardar RSVP:', result.error || result.message)
+        const errorMessage = result.error || result.message || 'Error desconocido'
+        alert(`Hubo un error al enviar tu RSVP: ${errorMessage}. Por favor, intenta de nuevo.`)
       }
     } catch (error) {
       console.error('Error al enviar RSVP:', error)
-      alert('Hubo un error de conexión. Por favor, verifica que el servidor esté corriendo.')
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        alert('Error de conexión: No se pudo conectar con el servidor. Por favor, asegúrate de que el servidor esté corriendo en el puerto 3001.')
+      } else {
+        alert(`Error: ${error.message}. Por favor, intenta de nuevo o verifica que el servidor esté corriendo.`)
+      }
     }
   }
 

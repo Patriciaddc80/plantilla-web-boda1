@@ -67,7 +67,7 @@ export default function GalleryCard() {
 
   return (
     <motion.section 
-      className="min-h-screen pt-0 pb-2 md:pt-0 md:pb-4 px-2 sm:px-4 md:px-6 bg-sage"
+      className="pt-4 pb-4 md:pt-0 md:pb-4 px-2 sm:px-4 md:px-6 bg-sage"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: "0px" }}

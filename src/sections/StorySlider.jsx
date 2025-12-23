@@ -67,7 +67,7 @@ export default function StorySlider() {
 
   return (
     <motion.section 
-      className="w-full py-8 md:py-12 px-4 md:px-6 bg-transparent"
+      className="w-full py-0 md:py-12 px-4 md:px-6 bg-transparent"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: "0px" }}

@@ -76,7 +76,7 @@ Cada RSVP tiene la siguiente estructura:
   "guests": "2",
   "attendance": "yes",
   "message": "¡Nos vemos pronto!",
-  "submittedAt": "2025-01-01T12:00:00.000Z"
+  "submittedAt": "2026-01-01T12:00:00.000Z"
 }
 ```
 

@@ -76,7 +76,7 @@ export default function GalleryCard() {
       <div className="max-w-7xl mx-auto">
         {/* Separador */}
         <motion.div 
-          className="w-full max-w-[200px] sm:max-w-xs md:max-w-md mx-auto px-3 sm:px-6 mb-4 sm:mb-6"
+          className="w-full max-w-[280px] sm:max-w-xs md:max-w-md mx-auto px-3 sm:px-6 mb-4 sm:mb-6"
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
@@ -329,7 +329,7 @@ export default function GalleryCard() {
           viewport={{ once: true }}
           transition={{ delay: 0.7 }}
         >
-          Comparte tus fotos con nosotros usando <span className="font-bold bg-olive/20 px-3 py-1.5 rounded-md text-olive text-lg md:text-xl">#ManuelaYDaniel2025</span>
+          Comparte tus fotos con nosotros usando <span className="font-bold bg-olive/20 px-3 py-1.5 rounded-md text-olive text-lg md:text-xl">#ManuelaYDaniel2026</span>
         </motion.p>
       </div>
     </motion.section>

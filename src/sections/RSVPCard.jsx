@@ -24,13 +24,33 @@ export default function RSVPCard() {
         body: JSON.stringify(formData),
       })
 
-      // Verificar si la respuesta es JSON válido
-      const contentType = response.headers.get('content-type')
-      if (!contentType || !contentType.includes('application/json')) {
-        throw new Error('La respuesta del servidor no es válida')
+      // Verificar si la respuesta existe
+      if (!response) {
+        throw new Error('No se recibió respuesta del servidor')
       }
 
-      const result = await response.json()
+      // Intentar parsear la respuesta como JSON
+      let result
+      try {
+        const contentType = response.headers.get('content-type')
+        if (contentType && contentType.includes('application/json')) {
+          result = await response.json()
+        } else {
+          // Si no es JSON, intentar leer el texto de la respuesta
+          const text = await response.text()
+          console.error('Respuesta del servidor no es JSON:', text)
+          throw new Error('La respuesta del servidor no es válida. Verifica que el servidor esté corriendo correctamente.')
+        }
+      } catch (parseError) {
+        if (parseError.message.includes('La respuesta del servidor no es válida')) {
+          throw parseError
+        }
+        // Si hay un error al parsear JSON, puede ser un error de red o servidor
+        if (!response.ok) {
+          throw new Error(`Error del servidor (${response.status}): ${response.statusText}`)
+        }
+        throw new Error('Error al procesar la respuesta del servidor')
+      }
 
       if (response.ok) {
         console.log('RSVP guardado correctamente:', result)
@@ -46,8 +66,10 @@ export default function RSVPCard() {
       }
     } catch (error) {
       console.error('Error al enviar RSVP:', error)
-      if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        alert('Error de conexión: No se pudo conectar con el servidor. Por favor, asegúrate de que el servidor esté corriendo en el puerto 3001.')
+      if (error.name === 'TypeError' && (error.message.includes('fetch') || error.message.includes('Failed to fetch'))) {
+        alert('Error de conexión: No se pudo conectar con el servidor. Por favor, asegúrate de que el servidor esté corriendo. Ejecuta: npm run server')
+      } else if (error.message.includes('La respuesta del servidor no es válida')) {
+        alert('Error: La respuesta del servidor no es válida. Por favor, verifica que el servidor esté corriendo correctamente en el puerto 3001.')
       } else {
         alert(`Error: ${error.message}. Por favor, intenta de nuevo o verifica que el servidor esté corriendo.`)
       }

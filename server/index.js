@@ -16,6 +16,20 @@ const PORT = process.env.PORT || 3001
 app.use(cors())
 app.use(express.json())
 
+// Middleware para asegurar que todas las respuestas sean JSON
+app.use((req, res, next) => {
+  // Guardar el método json original
+  const originalJson = res.json.bind(res)
+  
+  // Sobrescribir el método json para asegurar content-type
+  res.json = function(data) {
+    res.setHeader('Content-Type', 'application/json')
+    return originalJson(data)
+  }
+  
+  next()
+})
+
 // Middleware para manejar errores de parsing JSON
 app.use((err, req, res, next) => {
   if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
@@ -131,11 +145,16 @@ app.post('/api/rsvp', (req, res) => {
     })
   } catch (error) {
     console.error('Error al guardar RSVP:', error)
-    res.status(500).json({ 
-      success: false,
-      error: 'Error al guardar el RSVP',
-      details: error.message 
-    })
+    // Asegurar que siempre se responda con JSON
+    if (!res.headersSent) {
+      res.status(500).json({ 
+        success: false,
+        error: 'Error al guardar el RSVP',
+        details: error.message 
+      })
+    } else {
+      console.error('⚠️  No se pudo enviar respuesta de error porque ya se envió una respuesta')
+    }
   }
 })
 

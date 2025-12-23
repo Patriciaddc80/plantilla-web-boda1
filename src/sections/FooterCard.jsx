@@ -29,7 +29,7 @@ export default function FooterCard() {
             <div className="space-y-4 text-lg">
               <p className="flex items-center justify-center gap-2">
                 <Icon icon="mdi:email-outline" className="text-cream" />
-                <a href="mailto:manuela.daniel@boda2025.com" className="hover:underline text-cream">manuela.daniel@boda2025.com</a>
+                <a href="mailto:manuela.daniel@boda2026.com" className="hover:underline text-cream">manuela.daniel@boda2026.com</a>
               </p>
               <p className="flex items-center justify-center gap-2">
                 <Icon icon="mdi:phone-outline" className="text-cream" />
@@ -42,7 +42,7 @@ export default function FooterCard() {
               Con amor, Manuela & Daniel
             </p>
             <p className="text-sm text-yellow-200 flex items-center justify-center gap-1 flex-wrap">
-              <span>© 2025 - Hecho con</span>
+              <span>© 2026 - Hecho con</span>
               <Icon icon="mdi:heart-outline" className="inline-block text-yellow-300" />
               <span>por</span>
               <a 

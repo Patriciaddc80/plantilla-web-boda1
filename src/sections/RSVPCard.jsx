@@ -11,6 +11,7 @@ export default function RSVPCard() {
     message: ''
   })
   const [submitted, setSubmitted] = useState(false)
+  const [attendanceStatus, setAttendanceStatus] = useState('yes') // Guardar el estado de asistencia
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -54,11 +55,10 @@ export default function RSVPCard() {
 
       if (response.ok) {
         console.log('RSVP guardado correctamente:', result)
+        // Guardar el estado de asistencia antes de resetear el formulario
+        setAttendanceStatus(formData.attendance)
         setSubmitted(true)
-        setTimeout(() => {
-          setSubmitted(false)
-          setFormData({ name: '', email: '', guests: '', attendance: 'yes', message: '' })
-        }, 3000)
+        // No resetear automáticamente - el usuario debe cerrar manualmente
       } else {
         console.error('Error al guardar RSVP:', result.error || result.message)
         const errorMessage = result.error || result.message || 'Error desconocido'
@@ -116,14 +116,38 @@ export default function RSVPCard() {
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="text-center py-16 bg-white/50 backdrop-blur-sm rounded-2xl"
+              className="text-center py-16 bg-white/50 backdrop-blur-sm rounded-2xl relative"
             >
-              <div className="flex justify-center mb-6">
-                <Icon icon="mdi:check-circle-outline" className="text-6xl text-olive" />
-              </div>
-              <p className="text-2xl md:text-3xl text-olive font-semibold mb-3">¡Mensaje enviado correctamente!</p>
-              <p className="text-lg md:text-xl text-olive/80 mb-4 font-medium">Gracias por confirmar tu asistencia</p>
-              <p className="text-base md:text-lg text-olive/70">Hemos recibido tu confirmación y nos vemos pronto</p>
+              <button
+                onClick={() => {
+                  setSubmitted(false)
+                  setFormData({ name: '', email: '', guests: '', attendance: 'yes', message: '' })
+                  setAttendanceStatus('yes')
+                }}
+                className="absolute top-4 right-4 text-olive/60 hover:text-olive transition-colors"
+                aria-label="Cerrar mensaje"
+              >
+                <Icon icon="mdi:close" className="text-2xl md:text-3xl" />
+              </button>
+              {attendanceStatus === 'yes' ? (
+                <>
+                  <div className="flex justify-center mb-6">
+                    <Icon icon="mdi:check-circle-outline" className="text-6xl text-olive" />
+                  </div>
+                  <p className="text-2xl md:text-3xl text-olive font-semibold mb-3">¡Mensaje enviado correctamente!</p>
+                  <p className="text-lg md:text-xl text-olive/80 mb-4 font-medium">Gracias por confirmar tu asistencia</p>
+                  <p className="text-base md:text-lg text-olive/70">Hemos recibido tu confirmación y nos vemos pronto</p>
+                </>
+              ) : (
+                <>
+                  <div className="flex justify-center mb-6">
+                    <Icon icon="mdi:heart-outline" className="text-6xl text-olive/70" />
+                  </div>
+                  <p className="text-2xl md:text-3xl text-olive font-semibold mb-3">¡Gracias por tu respuesta!</p>
+                  <p className="text-lg md:text-xl text-olive/80 mb-4 font-medium">Lamentamos que no puedas acompañarnos</p>
+                  <p className="text-base md:text-lg text-olive/70">Tu respuesta ha sido registrada. Te extrañaremos ese día especial</p>
+                </>
+              )}
             </motion.div>
           ) : (
             <motion.form 

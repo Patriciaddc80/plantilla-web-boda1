@@ -54,16 +54,26 @@ Las funciones serverless están creadas en:
 
 ## 🔑 Variables de Entorno en Vercel
 
-Configura estas variables en Vercel Dashboard → Settings → Environment Variables:
+**⚠️ IMPORTANTE:** Las variables de entorno **DEBEN** configurarse en Vercel para que el email funcione en producción.
+
+### Configuración Rápida:
+
+1. Ve a tu proyecto en Vercel Dashboard
+2. **Settings** → **Environment Variables**
+3. Agrega estas 6 variables (ver guía detallada en `CONFIGURAR_VERCEL_EMAIL.md`):
 
 ```
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_SECURE=false
-SMTP_USER=tu-email@gmail.com
-SMTP_PASS=tu-contraseña-de-aplicación
-RSVP_NOTIFICATION_EMAIL=tu-email@gmail.com
+SMTP_USER=patriciaddc80@gmail.com
+SMTP_PASS=yztmsaaddvymjzzr
+RSVP_NOTIFICATION_EMAIL=patriciaddc80@gmail.com
 ```
+
+4. **IMPORTANTE:** Después de agregar las variables, **redesplega el proyecto**
+
+📖 **Guía detallada paso a paso:** Ver `CONFIGURAR_VERCEL_EMAIL.md`
 
 ## 🚀 Pasos para Desplegar
 

@@ -120,27 +120,40 @@ app.post('/api/rsvp', (req, res) => {
 
     // Enviar email de notificación de forma completamente asíncrona (no bloquea la respuesta)
     // Esto se ejecuta después de enviar la respuesta, así que nunca puede causar un error 500
+    console.log('📧 Iniciando proceso de envío de email...')
     setImmediate(() => {
       try {
         const recipientEmail = process.env.RSVP_NOTIFICATION_EMAIL || process.env.SMTP_USER
+        console.log('📧 Email destinatario configurado:', recipientEmail)
+        console.log('📧 Datos del RSVP:', JSON.stringify(newRSVP, null, 2))
+        
         if (recipientEmail) {
+          console.log('📤 Enviando email de notificación...')
           sendRSVPEmail(newRSVP, recipientEmail)
             .then(result => {
               if (result.success) {
                 console.log('✅ Email de notificación enviado correctamente')
+                console.log('📬 Message ID:', result.messageId || 'N/A')
               } else {
-                console.warn('⚠️  No se pudo enviar el email:', result.error)
+                console.error('❌ No se pudo enviar el email:', result.error)
+                console.error('📋 Detalles:', JSON.stringify(result, null, 2))
               }
             })
             .catch(error => {
               console.error('❌ Error al enviar email (no crítico):', error)
+              console.error('📋 Stack:', error.stack)
             })
         } else {
-          console.warn('⚠️  No se configuró RSVP_NOTIFICATION_EMAIL. El email no se enviará.')
+          console.error('❌ No se configuró RSVP_NOTIFICATION_EMAIL. El email no se enviará.')
+          console.error('📋 Variables de entorno disponibles:', {
+            RSVP_NOTIFICATION_EMAIL: process.env.RSVP_NOTIFICATION_EMAIL,
+            SMTP_USER: process.env.SMTP_USER
+          })
         }
       } catch (emailError) {
         // Esto nunca debería ejecutarse, pero por seguridad lo capturamos
         console.error('❌ Error inesperado al intentar enviar email:', emailError)
+        console.error('📋 Stack:', emailError.stack)
       }
     })
   } catch (error) {

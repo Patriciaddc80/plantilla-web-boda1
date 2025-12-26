@@ -5,6 +5,7 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { sendRSVPEmail } from './emailService.js'
+import { updateExcelFile } from './excelService.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -108,8 +109,21 @@ app.post('/api/rsvp', (req, res) => {
     // Agregar nuevo registro
     existingData.push(newRSVP)
 
-    // Guardar en archivo
+    // Guardar en archivo JSON
     fs.writeFileSync(rsvpFile, JSON.stringify(existingData, null, 2), 'utf8')
+
+    // Actualizar archivo Excel
+    try {
+      const excelResult = updateExcelFile(existingData)
+      if (excelResult.success) {
+        console.log(`✅ Excel actualizado: ${excelResult.recordCount} registros`)
+      } else {
+        console.warn('⚠️  No se pudo actualizar el archivo Excel:', excelResult.error)
+      }
+    } catch (excelError) {
+      console.error('❌ Error al actualizar Excel (no crítico):', excelError)
+      // No lanzamos el error porque el RSVP ya se guardó en JSON
+    }
 
     // Responder al cliente primero (antes de intentar enviar email)
     res.status(200).json({ 

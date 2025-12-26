@@ -11,6 +11,7 @@
     "dev:all": "concurrently \"npm run dev\" \"npm run server\"",
     "admin": "vite --open /admin",
     "test:email": "node server/testEmail.js",
+    "test:rsvp-email": "node server/testRSVPEmail.js",
     "update:excel": "node server/updateExcel.js"
   },
   "dependencies": {

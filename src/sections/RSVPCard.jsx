@@ -13,6 +13,53 @@ export default function RSVPCard() {
   const [submitted, setSubmitted] = useState(false)
   const [attendanceStatus, setAttendanceStatus] = useState('yes') // Guardar el estado de asistencia
 
+  // Parsear respuesta JSON
+  const parseResponse = async (response) => {
+    const contentType = response.headers.get('content-type')
+    if (contentType && contentType.includes('application/json')) {
+      return await response.json()
+    }
+    const text = await response.text()
+    console.error('Respuesta del servidor no es JSON:', text)
+    throw new Error('La respuesta del servidor no es válida. Verifica que el servidor esté corriendo correctamente.')
+  }
+
+  // Manejar errores y mostrar alertas
+  const handleError = (error, response) => {
+    console.error('Error al enviar RSVP:', error)
+    
+    if (error.message.includes('La respuesta del servidor no es válida')) {
+      alert('Error: La respuesta del servidor no es válida. Por favor, verifica que el servidor esté corriendo correctamente en el puerto 3001.')
+      return
+    }
+    
+    if (error.name === 'TypeError' && (error.message.includes('fetch') || error.message.includes('Failed to fetch'))) {
+      alert('Error de conexión: No se pudo conectar con el servidor. Por favor, asegúrate de que el servidor esté corriendo. Ejecuta: npm run server')
+      return
+    }
+    
+    if (response && !response.ok) {
+      alert(`Error: ${error.message}. Por favor, intenta de nuevo o verifica que el servidor esté corriendo.`)
+      return
+    }
+    
+    alert(`Error: ${error.message}. Por favor, intenta de nuevo o verifica que el servidor esté corriendo.`)
+  }
+
+  // Manejar respuesta exitosa
+  const handleSuccess = (result) => {
+    console.log('RSVP guardado correctamente:', result)
+    setAttendanceStatus(formData.attendance)
+    setSubmitted(true)
+  }
+
+  // Manejar respuesta con error
+  const handleErrorResponse = (result) => {
+    console.error('Error al guardar RSVP:', result.error || result.message)
+    const errorMessage = result.error || result.message || 'Error desconocido'
+    alert(`Hubo un error al enviar tu RSVP: ${errorMessage}. Por favor, intenta de nuevo.`)
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     
@@ -25,54 +72,24 @@ export default function RSVPCard() {
         body: JSON.stringify(formData),
       })
 
-      // Verificar si la respuesta existe
       if (!response) {
         throw new Error('No se recibió respuesta del servidor')
       }
 
-      // Intentar parsear la respuesta como JSON
-      let result
-      try {
-        const contentType = response.headers.get('content-type')
-        if (contentType && contentType.includes('application/json')) {
-          result = await response.json()
-        } else {
-          // Si no es JSON, intentar leer el texto de la respuesta
-          const text = await response.text()
-          console.error('Respuesta del servidor no es JSON:', text)
-          throw new Error('La respuesta del servidor no es válida. Verifica que el servidor esté corriendo correctamente.')
-        }
-      } catch (parseError) {
-        if (parseError.message.includes('La respuesta del servidor no es válida')) {
-          throw parseError
-        }
-        // Si hay un error al parsear JSON, puede ser un error de red o servidor
+      const result = await parseResponse(response).catch((parseError) => {
         if (!response.ok) {
           throw new Error(`Error del servidor (${response.status}): ${response.statusText}`)
         }
-        throw new Error('Error al procesar la respuesta del servidor')
-      }
+        throw parseError
+      })
 
       if (response.ok) {
-        console.log('RSVP guardado correctamente:', result)
-        // Guardar el estado de asistencia antes de resetear el formulario
-        setAttendanceStatus(formData.attendance)
-        setSubmitted(true)
-        // No resetear automáticamente - el usuario debe cerrar manualmente
+        handleSuccess(result)
       } else {
-        console.error('Error al guardar RSVP:', result.error || result.message)
-        const errorMessage = result.error || result.message || 'Error desconocido'
-        alert(`Hubo un error al enviar tu RSVP: ${errorMessage}. Por favor, intenta de nuevo.`)
+        handleErrorResponse(result)
       }
     } catch (error) {
-      console.error('Error al enviar RSVP:', error)
-      if (error.name === 'TypeError' && (error.message.includes('fetch') || error.message.includes('Failed to fetch'))) {
-        alert('Error de conexión: No se pudo conectar con el servidor. Por favor, asegúrate de que el servidor esté corriendo. Ejecuta: npm run server')
-      } else if (error.message.includes('La respuesta del servidor no es válida')) {
-        alert('Error: La respuesta del servidor no es válida. Por favor, verifica que el servidor esté corriendo correctamente en el puerto 3001.')
-      } else {
-        alert(`Error: ${error.message}. Por favor, intenta de nuevo o verifica que el servidor esté corriendo.`)
-      }
+      handleError(error, null)
     }
   }
 
@@ -85,7 +102,7 @@ export default function RSVPCard() {
 
   return (
     <motion.section 
-      className="min-h-screen py-8 md:py-20 px-4 md:px-6 bg-cream relative"
+      className="py-8 md:py-8 px-4 md:px-6 bg-cream relative"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: "0px" }}
@@ -100,15 +117,15 @@ export default function RSVPCard() {
         />
       </div>
 
-      <div className="max-w-2xl mx-auto relative z-10">
+      <div className="max-w-2xl w-full mx-auto relative z-10 px-6 md:px-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.2 }}
         >
-          <h2 className="text-4xl md:text-5xl mb-4 text-center text-olive">RSVP</h2>
-          <p className="text-center text-lg md:text-xl text-olive/70 mb-12 font-bold">
+          <h2 className="text-4xl md:text-5xl mb-2 md:mb-3 text-center text-olive">RSVP</h2>
+          <p className="text-center text-base md:text-xl text-olive/70 mb-4 md:mb-6 font-bold">
             Por favor confirma tu asistencia antes del 1 de Julio de 2026
           </p>
           
@@ -152,7 +169,7 @@ export default function RSVPCard() {
           ) : (
             <motion.form 
               onSubmit={handleSubmit} 
-              className="space-y-3 md:space-y-6 bg-white/50 backdrop-blur-sm p-4 md:p-12 rounded-2xl shadow-lg"
+              className="space-y-3 md:space-y-4 bg-white/50 backdrop-blur-sm p-4 md:p-6 rounded-2xl shadow-lg max-w-full mx-auto"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -162,7 +179,7 @@ export default function RSVPCard() {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full border-2 border-olive/20 rounded-full px-4 py-2 md:px-6 md:py-4 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-olive/50 focus:border-olive/50 bg-white"
+                className="w-full border-2 border-olive/20 rounded-full px-4 py-2 md:px-6 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-olive/50 focus:border-olive/50 bg-white"
                 placeholder="Tu nombre *"
                 required
               />
@@ -171,7 +188,7 @@ export default function RSVPCard() {
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full border-2 border-olive/20 rounded-full px-4 py-2 md:px-6 md:py-4 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-olive/50 focus:border-olive/50 bg-white"
+                className="w-full border-2 border-olive/20 rounded-full px-4 py-2 md:px-6 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-olive/50 focus:border-olive/50 bg-white"
                 placeholder="Tu email *"
                 required
               />
@@ -207,7 +224,7 @@ export default function RSVPCard() {
                   type="number"
                   value={formData.guests}
                   onChange={handleChange}
-                  className="w-full border-2 border-olive/20 rounded-full px-4 py-2 md:px-6 md:py-4 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-olive/50 focus:border-olive/50 bg-white"
+                  className="w-full border-2 border-olive/20 rounded-full px-4 py-2 md:px-6 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-olive/50 focus:border-olive/50 bg-white"
                   placeholder="Número de invitados"
                   min="1"
                 />
@@ -216,12 +233,12 @@ export default function RSVPCard() {
                 name="message"
                 value={formData.message}
                 onChange={handleChange}
-                className="w-full border-2 border-olive/20 rounded-2xl px-4 py-3 md:px-6 md:py-4 text-sm md:text-base h-24 md:h-32 resize-none focus:outline-none focus:ring-2 focus:ring-olive/50 focus:border-olive/50 bg-white"
+                className="w-full border-2 border-olive/20 rounded-2xl px-4 py-3 md:px-6 md:py-3 text-sm md:text-base h-24 md:h-20 resize-none focus:outline-none focus:ring-2 focus:ring-olive/50 focus:border-olive/50 bg-white"
                 placeholder="Mensaje (opcional)"
               />
               <motion.button
                 type="submit"
-                className="w-full bg-olive text-cream rounded-full py-3 md:py-4 text-sm md:text-lg font-semibold hover:bg-olive/90 transition-colors shadow-lg"
+                className="w-1/2 mx-auto block bg-olive text-cream rounded-full py-3 md:py-3 text-sm md:text-lg font-semibold hover:bg-olive/90 transition-colors shadow-lg"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -231,7 +248,7 @@ export default function RSVPCard() {
           )}
           
           <motion.p 
-            className="mt-8 text-center text-sm italic text-olive/70"
+            className="mt-4 md:mt-6 text-center text-sm italic text-olive/70"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}

@@ -1,7 +1,7 @@
 // Script para actualizar el archivo Excel con los datos existentes en rsvp.json
-import fs from 'fs'
-import path from 'path'
-import { fileURLToPath } from 'url'
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { updateExcelFile } from './excelService.js'
 
 const __filename = fileURLToPath(import.meta.url)

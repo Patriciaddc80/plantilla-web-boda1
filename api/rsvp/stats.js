@@ -1,7 +1,7 @@
 import { kv } from '@vercel/kv'
-import fs from 'fs'
-import path from 'path'
-import { fileURLToPath } from 'url'
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -59,7 +59,7 @@ export default async function handler(req, res) {
         notAttending: data.filter(r => r.attendance === 'no').length,
         totalGuests: data
           .filter(r => r.attendance === 'yes')
-          .reduce((sum, r) => sum + parseInt(r.guests || 1), 0)
+          .reduce((sum, r) => sum + Number.parseInt(r.guests || 1, 10), 0)
       }
       
       return res.status(200).json({ success: true, stats })

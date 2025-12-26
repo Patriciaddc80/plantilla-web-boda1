@@ -2,6 +2,7 @@ export function createRSVPEmailTemplate(rsvpData) {
   const attendanceText = rsvpData.attendance === 'yes' ? 'Sí asistirá' : 'No asistirá'
   const attendanceColor = rsvpData.attendance === 'yes' ? '#4a7c59' : '#c94a4a'
   const attendanceIcon = rsvpData.attendance === 'yes' ? '✓' : '✗'
+  const guestsText = rsvpData.guests === '1' ? 'invitado' : 'invitados'
   
   const formattedDate = new Date(rsvpData.submittedAt).toLocaleString('es-ES', {
     day: '2-digit',
@@ -110,7 +111,7 @@ export function createRSVPEmailTemplate(rsvpData) {
                                             </tr>
                                             <tr>
                                                 <td style="color: #333333; font-size: 24px; font-weight: 700;">
-                                                    ${rsvpData.guests} ${rsvpData.guests === '1' ? 'invitado' : 'invitados'}
+                                                    ${rsvpData.guests} ${guestsText}
                                                 </td>
                                             </tr>
                                         </table>

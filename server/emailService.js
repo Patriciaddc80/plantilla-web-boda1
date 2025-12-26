@@ -1,5 +1,11 @@
 import nodemailer from 'nodemailer'
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
 import { createRSVPEmailTemplate } from './emailTemplate.js'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 // Configuración del transporter de email
 // Puedes usar Gmail, Outlook, o cualquier otro servicio SMTP
@@ -68,12 +74,29 @@ export async function sendRSVPEmail(rsvpData, recipientEmail) {
     // Crear el contenido del email
     const htmlContent = createRSVPEmailTemplate(rsvpData)
 
+    // Ruta del archivo Excel para adjuntar
+    const excelFilePath = path.join(__dirname, '../server/data/rsvp.xlsx')
+    const attachments = []
+
+    // Si el archivo Excel existe, adjuntarlo
+    if (fs.existsSync(excelFilePath)) {
+      attachments.push({
+        filename: 'rsvp.xlsx',
+        path: excelFilePath,
+        contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      })
+      console.log('📎 Archivo Excel adjuntado al email')
+    } else {
+      console.warn('⚠️  El archivo Excel no existe, no se adjuntará al email')
+    }
+
     // Configurar el email
     const mailOptions = {
       from: `"Boda Manuela & Daniel" <${process.env.SMTP_USER}>`,
       to: recipientEmail,
       subject: `💐 Nueva Confirmación de Asistencia - ${rsvpData.name}`,
       html: htmlContent,
+      attachments: attachments,
       // Versión de texto plano como alternativa
       text: `
 Nueva Confirmación de Asistencia - RSVP
@@ -85,6 +108,8 @@ ${rsvpData.attendance === 'yes' ? `Número de invitados: ${rsvpData.guests}` : '
 ${rsvpData.message ? `Mensaje: ${rsvpData.message}` : ''}
 
 Fecha de confirmación: ${new Date(rsvpData.submittedAt).toLocaleString('es-ES')}
+
+${attachments.length > 0 ? '\n📎 Se adjunta el archivo Excel actualizado con todos los RSVPs.' : ''}
 
 ---
 Sistema de Gestión de RSVP

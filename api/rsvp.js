@@ -3,6 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { sendRSVPEmail } from '../server/emailService.js'
+import { generateExcelBuffer } from './excelService.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -136,6 +137,16 @@ export default async function handler(req, res) {
         console.warn('⚠️  No se pudo guardar el RSVP, pero el email se enviará')
       }
 
+      // Generar Excel en memoria para adjuntar al email (en producción/serverless)
+      let excelBuffer = null
+      try {
+        excelBuffer = generateExcelBuffer(existingData)
+        console.log('✅ Excel generado en memoria para adjuntar al email')
+      } catch (excelError) {
+        console.warn('⚠️  No se pudo generar Excel en memoria:', excelError)
+        // Continuar sin Excel adjunto
+      }
+
       // Responder al cliente primero
       res.status(200).json({ 
         success: true, 
@@ -151,7 +162,8 @@ export default async function handler(req, res) {
       
       if (recipientEmail) {
         console.log('📤 Enviando email de notificación...')
-        sendRSVPEmail(newRSVP, recipientEmail)
+        // Pasar el Excel buffer si existe
+        sendRSVPEmail(newRSVP, recipientEmail, excelBuffer)
           .then(result => {
             if (result.success) {
               console.log('✅ Email de notificación enviado correctamente')

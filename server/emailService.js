@@ -26,7 +26,7 @@ const createTransporter = () => {
     })
 }
 
-export async function sendRSVPEmail(rsvpData, recipientEmail) {
+export async function sendRSVPEmail(rsvpData, recipientEmail, excelBuffer = null) {
   try {
     // Validar que las variables de entorno estén configuradas
     if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
@@ -74,20 +74,31 @@ export async function sendRSVPEmail(rsvpData, recipientEmail) {
     // Crear el contenido del email
     const htmlContent = createRSVPEmailTemplate(rsvpData)
 
-    // Ruta del archivo Excel para adjuntar
-    const excelFilePath = path.join(__dirname, '../server/data/rsvp.xlsx')
     const attachments = []
 
-    // Si el archivo Excel existe, adjuntarlo
-    if (fs.existsSync(excelFilePath)) {
+    // Adjuntar Excel: si se proporciona un buffer (producción/serverless), usarlo
+    // Si no, intentar leer el archivo del disco (desarrollo local)
+    if (excelBuffer) {
+      // Producción: usar el buffer generado en memoria
       attachments.push({
         filename: 'rsvp.xlsx',
-        path: excelFilePath,
+        content: excelBuffer,
         contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       })
-      console.log('📎 Archivo Excel adjuntado al email')
+      console.log('📎 Archivo Excel adjuntado al email (desde buffer en memoria)')
     } else {
-      console.warn('⚠️  El archivo Excel no existe, no se adjuntará al email')
+      // Desarrollo local: intentar leer el archivo del disco
+      const excelFilePath = path.join(__dirname, '../server/data/rsvp.xlsx')
+      if (fs.existsSync(excelFilePath)) {
+        attachments.push({
+          filename: 'rsvp.xlsx',
+          path: excelFilePath,
+          contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        })
+        console.log('📎 Archivo Excel adjuntado al email (desde archivo en disco)')
+      } else {
+        console.warn('⚠️  El archivo Excel no existe, no se adjuntará al email')
+      }
     }
 
     // Configurar el email

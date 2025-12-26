@@ -143,7 +143,8 @@ app.post('/api/rsvp', (req, res) => {
         
         if (recipientEmail) {
           console.log('📤 Enviando email de notificación...')
-          sendRSVPEmail(newRSVP, recipientEmail)
+          // En desarrollo local, el emailService leerá el archivo del disco
+          sendRSVPEmail(newRSVP, recipientEmail, null)
             .then(result => {
               if (result.success) {
                 console.log('✅ Email de notificación enviado correctamente')
